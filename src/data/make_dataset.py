@@ -1,30 +1,56 @@
-# -*- coding: utf-8 -*-
-import click
-import logging
-from pathlib import Path
-from dotenv import find_dotenv, load_dotenv
+from datasets import load_dataset
+import torch
 
-
-@click.command()
-@click.argument('input_filepath', type=click.Path(exists=True))
-@click.argument('output_filepath', type=click.Path())
-def main(input_filepath, output_filepath):
-    """ Runs data processing scripts to turn raw data from (../raw) into
-        cleaned data ready to be analyzed (saved in ../processed).
+def make_data_split(data, train_split, validation_split, test_split):
     """
-    logger = logging.getLogger(__name__)
-    logger.info('making final data set from raw data')
+    Description:
+        Making train, validation, test split of data and returning these. 
+    
+    Inputs:
+        data: The dataset used to make the splits.
+            type: Dataset
+        train_split: the amount of data used for training.
+            type: float between 0 and 1
+        validation_split: the amount of data used for validation.
+            type: float between 0 and 1
+        test_split: the amount of data used for testing.
+            type: float between 0 and 1
+    """
 
+    total_split = train_split + validation_split + test_split
+
+    train_split = train_split/total_split
+    validation_split = validation_split/total_split
+    test_split = test_split/total_split
+
+    train_len = int(len(data)*train_split)
+    validation_len = int(len(data)*validation_split)
+    test_len = int(len(data)*test_split)
+    ####### Making sure that lengths add up, by adding the rest of the data to the training split.
+    train_len = train_len + len(data) - (train_len + validation_len + test_len)
+
+    train, validation, test = torch.utils.data.random_split(data, [train_len, validation_len, test_len])
+
+    return train, validation, test
+
+def main():
+    """
+    Description:
+        Downloading and saving the raw data to raw data folder.
+        Diving the raw data into training, validation and testing and saving these into the processed data folder
+    """
+    data = load_dataset('tweets_hate_speech_detection', split='train')
+    torch.save(data,"data/raw/data.pt")
+
+    train_split = 0.7
+    validation_split = 0.15
+    test_split = 0.15
+
+    train, validation, test = make_data_split(data, train_split, validation_split, test_split)
+
+    torch.save(train, "data/processed/train.pt")
+    torch.save(validation, "data/processed/validation.pt")
+    torch.save(test, "data/processed/test.pt")
 
 if __name__ == '__main__':
-    log_fmt = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-    logging.basicConfig(level=logging.INFO, format=log_fmt)
-
-    # not used in this stub but often useful for finding various files
-    project_dir = Path(__file__).resolve().parents[2]
-
-    # find .env automagically by walking up directories until it's found, then
-    # load up the .env entries as environment variables
-    load_dotenv(find_dotenv())
-
     main()
