@@ -5,7 +5,7 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import precision_recall_fscore_support, accuracy_score
 
-from transformers import Trainer, AutoModelForSequenceClassification, AutoTokenizer
+from transformers import Trainer, T5ForConditionalGeneration, AutoTokenizer
 from transformers import TrainingArguments
 from datasets import Dataset
 import hydra
@@ -15,30 +15,10 @@ import logging
 import random
 
 base_models = {
-        "bert" : {
-                "checkpoint": "Maltehb/danish-bert-botxo", 
-                "save":"bert",
-                "cased": False,
-        },
-        "electra-c": {
-            "checkpoint": "Maltehb/-l-ctra-danish-electra-small-cased",
-            "save":"electra-c",
-            "cased": True,
-        },
-        "electra-u": {
-            "checkpoint": "Maltehb/-l-ctra-danish-electra-small-uncased", 
-            "save":"electra-u",
-            "cased": False,
-        },
-        "xlmb": {
-            "checkpoint": "xlm-roberta-base", 
-            "save": "xlmb",
-            "cased": True,
-        },
-        "xlml": {
-            "checkpoint": "xlm-roberta-large", 
-            "save": "xlml",
-            "cased": True,
+        'byt5': 
+        {
+            'checkpoint': 'Narrativa/byt5-base-tweet-hate-detection',
+            'save': 'byt5',
         }
 }
 
@@ -110,7 +90,7 @@ def main(config):
 
         model_checkpoint = base_model["checkpoint"]
         tokenizer = AutoTokenizer.from_pretrained(model_checkpoint, do_lower_case=(not base_model['cased']))
-        model = AutoModelForSequenceClassification.from_pretrained(model_checkpoint, num_labels=len(labels))
+        model = T5ForConditionalGeneration.from_pretrained(model_checkpoint, num_labels=len(labels))
 
         batch_size = wandb.config["batch_size"]
         max_length = wandb.config["maxlength"]
