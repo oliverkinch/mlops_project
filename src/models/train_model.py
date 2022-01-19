@@ -56,7 +56,7 @@ def main(config):
         if mname not in base_models:
             print("Model name not in base models")
             exit(0)
-        cwd = os.getcwd().split("mlops_project")[0] + "mlops_project/"
+        cwd = os.getcwd().split("outputs")[0]
         base_model = base_models[mname]
         data_dir = cwd + config["dirs"]["data"]
 
