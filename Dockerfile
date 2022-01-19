@@ -13,7 +13,6 @@ WORKDIR /
 COPY requirements.txt requirements.txt
 COPY setup.py setup.py
 COPY src/ src/
-COPY configs/ configs/
 COPY models/ models/
 
 RUN pip install --upgrade pip
