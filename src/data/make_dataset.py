@@ -32,7 +32,7 @@ def make_data_split(
     train_len = int(len(data) * train_split)
     validation_len = int(len(data) * validation_split)
     test_len = int(len(data) * test_split)
-    ####### Making sure that lengths add up, by adding the rest of the data to the training split.
+    # Making sure that lengths add up, by adding the rest of the data to the training split.
     train_len = train_len + len(data) - (train_len + validation_len + test_len)
 
     train, validation, test = torch.utils.data.random_split(
@@ -46,7 +46,7 @@ def main():
     """
     Description:
         Downloading and saving the raw data to raw data folder.
-        Diving the raw data into training, validation and testing 
+        Diving the raw data into training, validation and testing
         and saving these into the processed data folder
     """
     data = load_dataset("tweets_hate_speech_detection", split="train")

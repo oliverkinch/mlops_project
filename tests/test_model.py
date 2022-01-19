@@ -1,9 +1,4 @@
-from transformers import (
-    AutoTokenizer,
-    T5ForConditionalGeneration,
-    AutoModelForSequenceClassification,
-    pipeline,
-)
+from transformers import AutoTokenizer, AutoModelForSequenceClassification
 import torch
 
 
