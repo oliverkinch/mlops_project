@@ -1,3 +1,6 @@
+FROM nvidia/cuda:10.2-base
+CMD nvidia-smi
+
 FROM python:3.8-slim
 
 # install python 
@@ -14,9 +17,10 @@ COPY models/ models/
 WORKDIR /
 RUN pip install --upgrade pip
 RUN pip install -r requirements.txt --no-cache-dir
-RUN pip install dvc
-RUN pip install dvc[gs]
-RUN dvc init --no-scm
+RUN pip install dvc --no-cache-dir
+RUN pip install dvc[gs] --no-cache-dir
+RUN pip install wandb --no-cache-dir
+RUN dvc init --no-scm 
 RUN dvc pull
 
 ENTRYPOINT ["python", "-u", "src/models/train_model.py"]
