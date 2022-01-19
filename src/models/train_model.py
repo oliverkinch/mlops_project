@@ -73,9 +73,9 @@ def main(config):
 
         # DATA PREPROCESSING
 
-        train = torch.load(data_dir + "train.pt")
-        validation = torch.load(data_dir + "validation.pt")
-        test = torch.load(data_dir + "test.pt")
+        train = torch.load(data_dir + "train.pth")
+        validation = torch.load(data_dir + "validation.pth")
+        test = torch.load(data_dir + "test.pth")
 
         labels = ["hate-speech", "no-hate-speech"]
         labels_str2int = {l: i for i, l in enumerate(labels)}

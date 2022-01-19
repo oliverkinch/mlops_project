@@ -60,9 +60,9 @@ def main():
         data, train_split, validation_split, test_split
     )
 
-    torch.save(train, "data/processed/train.pt")
-    torch.save(validation, "data/processed/validation.pt")
-    torch.save(test, "data/processed/test.pt")
+    torch.save(train, "data/processed/train.pth")
+    torch.save(validation, "data/processed/validation.pth")
+    torch.save(test, "data/processed/test.pth")
 
 
 if __name__ == "__main__":
