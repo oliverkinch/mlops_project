@@ -5,7 +5,7 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import precision_recall_fscore_support, accuracy_score
 
-from transformers import Trainer, T5ForConditionalGeneration, AutoTokenizer
+from transformers import Trainer, T5ForConditionalGeneration, AutoTokenizer, AutoModelForSequenceClassification
 from transformers import TrainingArguments
 from datasets import Dataset
 import hydra
@@ -19,6 +19,11 @@ base_models = {
         {
             'checkpoint': 'Narrativa/byt5-base-tweet-hate-detection',
             'save': 'byt5',
+        },
+                'bert':
+        {
+            'checkpoint': 'nlptown/bert-base-multilingual-uncased-sentiment'   ,
+            'save': 'bert'        
         }
 }
 
@@ -90,7 +95,10 @@ def main(config):
 
         model_checkpoint = base_model["checkpoint"]
         tokenizer = AutoTokenizer.from_pretrained(model_checkpoint, do_lower_case=(not base_model['cased']))
-        model = T5ForConditionalGeneration.from_pretrained(model_checkpoint, num_labels=len(labels))
+        if mname == 'byt5':
+            model = T5ForConditionalGeneration.from_pretrained(model_checkpoint, num_labels=len(labels))
+        elif mname == 'bert':
+            model = AutoModelForSequenceClassification.from_pretrained(model_checkpoint)
 
         batch_size = wandb.config["batch_size"]
         max_length = wandb.config["maxlength"]
