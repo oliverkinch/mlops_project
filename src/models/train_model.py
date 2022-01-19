@@ -31,6 +31,10 @@ def get_args():
         '--model-clouddir',
         default=None,
         help='The directory to store the model')
+    parser.add_argument(
+        '--api-key',
+        default=None,
+        help='wandb api key')
 
     args = parser.parse_args()
     return args
@@ -49,13 +53,16 @@ def compute_metrics(eval_pred: torch.Tensor) -> dict:
     return {"accuracy": acc, "f1": f1, "precision": precision, "recall": recall}
 
 
-docker_api = os.environ.get("WANDB_API")
-wandb.login(key=docker_api)
+
 
 
 @hydra.main(config_path="../../configs", config_name="config.yaml")
 def main(config):
     args = get_args()
+    if args.api_key:
+        WANDB_API_KEY = args.api_key
+    docker_api = os.environ.get("WANDB_API")
+    wandb.login(key=WANDB_API_KEY)
     # use GPU
     with wandb.init(
         project=config["model"]["name"], config=dict(config["hyperparameters"])
