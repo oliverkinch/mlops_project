@@ -1,0 +1,18 @@
+model:
+  name: bert
+dirs:
+  data: data/processed/
+  models: models/
+hyperparameters:
+  epochs: 1
+  batch_size: 64
+  maxlength: 512
+  lr: 0.00002
+  weight_decay: 0.01
+  devset_ratio: 0.2
+  metric_name: f1
+  evaluation_strategy: epoch
+  save_strategy: epoch
+  per_device_eval_batch_size: 16
+  load_best_model_at_end: True
+  pretrained: True

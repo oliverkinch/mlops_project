@@ -56,13 +56,14 @@ def compute_metrics(eval_pred: torch.Tensor) -> dict:
 
 
 
-@hydra.main(config_path="../../configs", config_name="config.yaml")
+@hydra.main(config_path="configs", config_name="config.yaml")
 def main(config):
     args = get_args()
     if args.api_key:
         WANDB_API_KEY = args.api_key
         os.environ['WANDB_API'] = WANDB_API_KEY
     
+    os.environ['WANDB_API'] = '58ce7d248861e83f1718e4fed0dba7c0925d6b08'
     docker_api = os.environ.get("WANDB_API")
     wandb.login(key=docker_api)
     # use GPU
@@ -209,12 +210,12 @@ def main(config):
         model.save_pretrained(save_dir)
         tokenizer.save_pretrained(save_dir)
 
-        if args.model_dir:
+        if args.model_clouddir:
             tmp_model_file = os.path.join('/tmp', MODEL_FILE_NAME)
             torch.save(model.state_dict(), tmp_model_file)
             subprocess.check_call([
                 'gsutil', 'cp', tmp_model_file,
-                os.path.join(args.model_dir, MODEL_FILE_NAME)])
+                os.path.join(args.model_clouddir, MODEL_FILE_NAME)])
         # EVALUATE
 
         trainer.evaluate()
