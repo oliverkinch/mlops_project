@@ -61,8 +61,10 @@ def main(config):
     args = get_args()
     if args.api_key:
         WANDB_API_KEY = args.api_key
+        os.environ['WANDB_API'] = WANDB_API_KEY
+    
     docker_api = os.environ.get("WANDB_API")
-    wandb.login(key=WANDB_API_KEY)
+    wandb.login(key=docker_api)
     # use GPU
     with wandb.init(
         project=config["model"]["name"], config=dict(config["hyperparameters"])
