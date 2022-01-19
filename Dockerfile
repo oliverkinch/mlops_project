@@ -8,7 +8,7 @@ RUN apt update && \
 COPY requirements.txt requirements.txt
 COPY setup.py setup.py
 COPY src/ src/
-COPY data/ data/
+RUN dvc pull
 
 WORKDIR /
 RUN pip install --upgrade pip
