@@ -18,26 +18,9 @@ import wandb
 import logging
 import argparse
 import subprocess
+from omegaconf import OmegaConf
 
 MODEL_FILE_NAME = 'bert.model'
-
-def get_args():
-    """Argument parser.
-        Returns:
-        Dictionary of arguments.
-    """
-    parser = argparse.ArgumentParser(description='Bert for hate speech')
-    parser.add_argument(
-        '--model-clouddir',
-        default=None,
-        help='The directory to store the model')
-    parser.add_argument(
-        '--api-key',
-        default=None,
-        help='wandb api key')
-
-    args = parser.parse_args()
-    return args
 
 base_models = {"bert": {"checkpoint": "bert-base-cased", "save": "bert", "cased": True}}
 
@@ -54,18 +37,13 @@ def compute_metrics(eval_pred: torch.Tensor) -> dict:
 
 
 
-
+os.environ['WANDB_API'] = '58ce7d248861e83f1718e4fed0dba7c0925d6b08'
+docker_api = os.environ.get("WANDB_API")
+wandb.login(key=docker_api)
 
 @hydra.main(config_path="configs", config_name="config.yaml")
 def main(config):
-    args = get_args()
-    if args.api_key:
-        WANDB_API_KEY = args.api_key
-        os.environ['WANDB_API'] = WANDB_API_KEY
-    
-    os.environ['WANDB_API'] = '58ce7d248861e83f1718e4fed0dba7c0925d6b08'
-    docker_api = os.environ.get("WANDB_API")
-    wandb.login(key=docker_api)
+    print(f"Training configuration: \n {OmegaConf.to_yaml(config)}")
     # use GPU
     with wandb.init(
         project=config["model"]["name"], config=dict(config["hyperparameters"])
@@ -210,12 +188,12 @@ def main(config):
         model.save_pretrained(save_dir)
         tokenizer.save_pretrained(save_dir)
 
-        if args.model_clouddir:
+        if config['dirs']['cloud']:
             tmp_model_file = os.path.join('/tmp', MODEL_FILE_NAME)
             torch.save(model.state_dict(), tmp_model_file)
             subprocess.check_call([
                 'gsutil', 'cp', tmp_model_file,
-                os.path.join(args.model_clouddir, MODEL_FILE_NAME)])
+                os.path.join(config['dirs']['cloud'], MODEL_FILE_NAME)])
         # EVALUATE
 
         trainer.evaluate()

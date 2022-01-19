@@ -3,6 +3,7 @@ model:
 dirs:
   data: data/processed/
   models: models/
+  cloud: gcr.io/mlopsproject-338710/testing:latest
 hyperparameters:
   epochs: 1
   batch_size: 64
