@@ -81,7 +81,7 @@ Project Organization
 - [X] Write unit tests related to the data part of your code
 - [X] Write unit tests related to model construction
 - [ ] Calculate the coverage.
-- [O] Get some continuous integration running on the github repository
+- [X] Get some continuous integration running on the github repository
 - [ ] (optional) Create a new project on `gcp` and invite all group members to it
 - [ ] Create a data storage on `gcp` for you data
 - [ ] Create a trigger workflow for automatically building your docker images
