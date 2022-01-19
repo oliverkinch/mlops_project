@@ -51,7 +51,7 @@ def main(config):
         torch.cuda.empty_cache()
         device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         print(device)
-        
+
         mname = config["model"]["name"]
         if mname not in base_models:
             print("Model name not in base models")
