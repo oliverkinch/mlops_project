@@ -1,26 +1,26 @@
 from transformers import AutoTokenizer, T5ForConditionalGeneration, AutoModelForSequenceClassification, pipeline
+import torch
+
 
 def classify_tweet(tweet):
+    d = {
+        0: 'no-hate-speech',
+        1: 'hate-speech'
+    }
     device = 'cpu'
     inputs = tokenizer([tweet], padding='max_length', truncation=True, max_length=512, return_tensors='pt')
     input_ids = inputs.input_ids.to(device)
     attention_mask = inputs.attention_mask.to(device)
-    output = model.generate(input_ids, attention_mask=attention_mask)
-    return tokenizer.decode(output[0], skip_special_tokens=True)
+    output = model(input_ids, attention_mask=attention_mask)
+    pred = torch.argmax(output.logits[0]).item()
+    return d[pred]
 
 
-c = 'Narrativa/byt5-base-tweet-hate-detection'
-tokenizer = AutoTokenizer.from_pretrained(c)
-model = T5ForConditionalGeneration.from_pretrained(c)
+n_labels = 2
+checkpoint = 'bert-base-cased'
+tokenizer = AutoTokenizer.from_pretrained(checkpoint)
+model = AutoModelForSequenceClassification.from_pretrained(checkpoint, num_labels=n_labels)
 
-# Test pretrained model
-nice_result = classify_tweet('what a nice nice nice nice day')
-bad_result = classify_tweet('Are you stupid, asshole?')
-assert nice_result == 'no-hate-speech', 'Wrong prediction, is the model trained?'
-assert bad_result == 'hate-speech', 'Wrong prediction, is the model trained?'
+assert model.classifier.out_features == 2, 'There should be two output features'
 
-# Test non-trained model
-model.init_weights()
-random_results = classify_tweet('what a nice nice nice nice day')
-assert random_results != 'no-hate-speech' or random_results != 'hate-speech', \
-    'Non-trained model should not make the right prediction'
+assert isinstance(classify_tweet('Life is nice'), str), 'Classifier should output hate speech or no hate speech'
