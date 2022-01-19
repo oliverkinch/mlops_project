@@ -16,10 +16,10 @@ import logging
 import random
 
 base_models = {
-        'byt5': 
+        'bert': 
         {
-            'checkpoint': 'Narrativa/byt5-base-tweet-hate-detection',
-            'save': 'byt5',
+            'checkpoint': 'bert-base-cased',
+            'save': 'bert',
             'cased': True
         }
 }
@@ -49,8 +49,9 @@ def main(config):
 
         mname = config["model"]["name"]
         if mname not in base_models:
+            print('Model name not in base models')
             exit(0)
-        cwd = os.getcwd().split("mlops_project")[0] + "mlops_project\\"
+        cwd = os.getcwd().split("mlops_project")[0] + "mlops_project/"
         base_model = base_models[mname]
         data_dir = cwd + config["dirs"]["data"]
 
@@ -93,9 +94,9 @@ def main(config):
 
         model_checkpoint = base_model["checkpoint"]
         tokenizer = AutoTokenizer.from_pretrained(model_checkpoint, do_lower_case=(not base_model['cased']))
-        model = T5ForConditionalGeneration.from_pretrained(model_checkpoint, num_labels=len(labels))
+        model = AutoModelForSequenceClassification.from_pretrained(model_checkpoint, num_labels=len(labels))
 
-        if not config['pretrained']:
+        if not wandb.config['pretrained']:
             model.init_weights()
 
         batch_size = wandb.config["batch_size"]

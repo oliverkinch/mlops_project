@@ -1,8 +1,8 @@
 model:
-  name: byt5
+  name: bert
 dirs:
-  data: data\\processed\\
-  models: models\\
+  data: data/processed/
+  models: models/
 hyperparameters:
   epochs: 10
   batch_size: 64
@@ -15,3 +15,4 @@ hyperparameters:
   save_strategy: epoch
   per_device_eval_batch_size: 16
   load_best_model_at_end: True
+  pretrained: True
