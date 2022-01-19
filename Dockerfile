@@ -14,6 +14,7 @@ COPY models/ models/
 WORKDIR /
 RUN pip install --upgrade pip
 RUN pip install -r requirements.txt --no-cache-dir
+RUN pip install dvc
 RUN pip install dvc[gs]
 RUN dvc init
 RUN dvc pull
