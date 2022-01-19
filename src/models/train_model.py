@@ -5,6 +5,7 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import precision_recall_fscore_support, accuracy_score
 
+
 from transformers import Trainer, T5ForConditionalGeneration, AutoTokenizer, AutoModelForSequenceClassification
 from transformers import TrainingArguments
 from datasets import Dataset
@@ -18,7 +19,8 @@ base_models = {
         'byt5': 
         {
             'checkpoint': 'Narrativa/byt5-base-tweet-hate-detection',
-            'save': 'byt5'
+            'save': 'byt5',
+            'cased': True
         }
 }
 
@@ -34,7 +36,8 @@ def compute_metrics(eval_pred):
             'recall': recall
             }
 
-wandb.login()
+docker_api = os.environ.get("WANDB_API")
+wandb.login(key=docker_api)
 @hydra.main(config_path="../../configs", config_name="config.yaml")
 
 def main(config):
@@ -55,7 +58,7 @@ def main(config):
         devset_ratio = wandb.config["devset_ratio"]
         assert(0<devset_ratio<1)
         
-        assert(os.path.exists(cwd + config["dirs"]["models"]))
+        assert(os.path.exists(cwd + config["dirs"]["models"])), f"cwd: {cwd}, dir:{config['dirs']['models']}"
         save_dir = os.path.join(cwd + config["dirs"]["models"], base_model["save"])
         if not os.path.exists(save_dir):
             os.makedirs(save_dir)
@@ -91,6 +94,7 @@ def main(config):
         model_checkpoint = base_model["checkpoint"]
         tokenizer = AutoTokenizer.from_pretrained(model_checkpoint, do_lower_case=(not base_model['cased']))
         model = T5ForConditionalGeneration.from_pretrained(model_checkpoint, num_labels=len(labels))
+
         if not config['pretrained']:
             model.init_weights()
 
