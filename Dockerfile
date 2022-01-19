@@ -23,5 +23,6 @@ RUN pip install dvc[gs] --no-cache-dir
 RUN pip install wandb --no-cache-dir
 RUN dvc init --no-scm 
 RUN dvc pull
+COPY data/ data/
 
 ENTRYPOINT ["python", "src/models/train_model.py"]
