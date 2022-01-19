@@ -16,7 +16,24 @@ from datasets import Dataset
 import hydra
 import wandb
 import logging
+import argparse
+import subprocess
 
+MODEL_FILE_NAME = 'bert.model'
+
+def get_args():
+    """Argument parser.
+        Returns:
+        Dictionary of arguments.
+    """
+    parser = argparse.ArgumentParser(description='Bert for hate speech')
+    parser.add_argument(
+        '--model-clouddir',
+        default=None,
+        help='The directory to store the model')
+
+    args = parser.parse_args()
+    return args
 
 base_models = {"bert": {"checkpoint": "bert-base-cased", "save": "bert", "cased": True}}
 
@@ -38,6 +55,7 @@ wandb.login(key=docker_api)
 
 @hydra.main(config_path="../../configs", config_name="config.yaml")
 def main(config):
+    args = get_args()
     # use GPU
     with wandb.init(
         project=config["model"]["name"], config=dict(config["hyperparameters"])
@@ -182,6 +200,12 @@ def main(config):
         model.save_pretrained(save_dir)
         tokenizer.save_pretrained(save_dir)
 
+        if args.model_dir:
+            tmp_model_file = os.path.join('/tmp', MODEL_FILE_NAME)
+            torch.save(model.state_dict(), tmp_model_file)
+            subprocess.check_call([
+                'gsutil', 'cp', tmp_model_file,
+                os.path.join(args.model_dir, MODEL_FILE_NAME)])
         # EVALUATE
 
         trainer.evaluate()
