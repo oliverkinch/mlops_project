@@ -8,10 +8,12 @@ RUN apt update && \
 COPY requirements.txt requirements.txt
 COPY setup.py setup.py
 COPY src/ src/
-RUN dvc pull
+
 
 WORKDIR /
 RUN pip install --upgrade pip
 RUN pip install -r requirements.txt --no-cache-dir
+RUN pip install dvc
+RUN dvc pull
 
 ENTRYPOINT ["python", "-u", "src/models/train_model.py"]
