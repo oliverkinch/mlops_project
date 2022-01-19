@@ -1,7 +1,8 @@
 from datasets import load_dataset
 import torch
+from torch.utils.data import Dataset
 
-def make_data_split(data, train_split, validation_split, test_split):
+def make_data_split(data: Dataset, train_split: float, validation_split: float, test_split: float):
     """
     Description:
         Making train, validation, test split of data and returning these. 
