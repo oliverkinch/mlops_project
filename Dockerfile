@@ -8,20 +8,21 @@ RUN apt update && \
     apt install --no-install-recommends -y build-essential gcc && \
     apt clean && rm -rf /var/lib/apt/lists/*
 
-WORKDIR /
+WORKDIR /app
 
-COPY requirements.txt requirements.txt
-COPY setup.py setup.py
-COPY src/ src/
-COPY models/ models/
+COPY requirements.txt /app/requirements.txt
+COPY setup.py /app/setup.py
+COPY src/ /app/src/
+COPY models/ /app/models/
+COPY .git/ /app/.git/
+COPY .dvc/ /app/.dvc/
+COPY data.dvc /app/data.dvc
 
 RUN pip install --upgrade pip
 RUN pip install -r requirements.txt --no-cache-dir
 RUN pip install dvc --no-cache-dir
 RUN pip install dvc[gs] --no-cache-dir
-RUN pip install wandb --no-cache-dir
-RUN dvc init --no-scm 
+RUN pip install wandb --no-cache-dir 
 RUN dvc pull
-COPY data/ data/
 
 ENTRYPOINT ["python", "src/models/train_model.py"]
