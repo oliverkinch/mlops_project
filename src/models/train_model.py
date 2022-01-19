@@ -18,12 +18,7 @@ base_models = {
         'byt5': 
         {
             'checkpoint': 'Narrativa/byt5-base-tweet-hate-detection',
-            'save': 'byt5',
-        },
-                'bert':
-        {
-            'checkpoint': 'nlptown/bert-base-multilingual-uncased-sentiment'   ,
-            'save': 'bert'        
+            'save': 'byt5'
         }
 }
 
@@ -95,10 +90,9 @@ def main(config):
 
         model_checkpoint = base_model["checkpoint"]
         tokenizer = AutoTokenizer.from_pretrained(model_checkpoint, do_lower_case=(not base_model['cased']))
-        if mname == 'byt5':
-            model = T5ForConditionalGeneration.from_pretrained(model_checkpoint, num_labels=len(labels))
-        elif mname == 'bert':
-            model = AutoModelForSequenceClassification.from_pretrained(model_checkpoint)
+        model = T5ForConditionalGeneration.from_pretrained(model_checkpoint, num_labels=len(labels))
+        if not config['pretrained']:
+            model.init_weights()
 
         batch_size = wandb.config["batch_size"]
         max_length = wandb.config["maxlength"]
