@@ -84,7 +84,7 @@ Project Organization
 - [X] Get some continuous integration running on the github repository
 - [X] (optional) Create a new project on `gcp` and invite all group members to it
 - [X] Create a data storage on `gcp` for you data
-- [ ] Create a trigger workflow for automatically building your docker images
+- [X] Create a trigger workflow for automatically building your docker images
 - [ ] Get your model training on `gcp`
 - [ ] Play around with distributed data loading
 - [ ] (optional) Play around with distributed model training
