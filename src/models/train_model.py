@@ -24,7 +24,7 @@ base_models = {
         }
 }
 
-def compute_metrics(eval_pred): 
+def compute_metrics(eval_pred: torch.Tensor) -> dict: 
     predictions, true_labels = eval_pred
     preds = predictions.argmax(-1)
     precision, recall, f1, _ = precision_recall_fscore_support(true_labels, preds, average='macro')
