@@ -13,7 +13,7 @@ COPY data/ data/
 COPY configs/ configs/
 COPY outputs/ outputs/
 COPY wandb/ wandb/
-COPY models/ models/
+COPY models/bert/ models/bert/
 
 WORKDIR /
 RUN pip install -r requirements.txt --no-cache-dir
