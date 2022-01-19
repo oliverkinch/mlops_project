@@ -15,6 +15,7 @@ WORKDIR /
 RUN pip install --upgrade pip
 RUN pip install -r requirements.txt --no-cache-dir
 RUN pip install dvc[gs]
+RUN dvc init
 RUN dvc pull
 
 ENTRYPOINT ["python", "-u", "src/models/train_model.py"]
