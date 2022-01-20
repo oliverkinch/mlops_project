@@ -9,12 +9,8 @@ from datasets import Dataset, load_dataset
 from omegaconf import OmegaConf
 from sklearn.metrics import accuracy_score, precision_recall_fscore_support
 from torch.utils.data.dataset import Subset
-from transformers import (
-    AutoModelForSequenceClassification,
-    AutoTokenizer,
-    Trainer,
-    TrainingArguments,
-)
+from transformers import (AutoModelForSequenceClassification, AutoTokenizer,
+                          Trainer, TrainingArguments)
 
 import wandb
 

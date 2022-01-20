@@ -1,5 +1,5 @@
-from transformers import AutoModelForSequenceClassification, AutoTokenizer
 import numpy as np
+from transformers import AutoModelForSequenceClassification, AutoTokenizer
 
 
 def classify_tweet(tweet):
