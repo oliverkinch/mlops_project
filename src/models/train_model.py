@@ -1,31 +1,25 @@
-import torch
-import os
 import json
-from sklearn.metrics import (
-    precision_recall_fscore_support,
-    accuracy_score
-)
-
-from transformers import (
-    Trainer,
-    AutoTokenizer,
-    AutoModelForSequenceClassification,
-)
-from transformers import TrainingArguments
-from datasets import Dataset
-import hydra
-import wandb
 import logging
-import argparse
-import subprocess
-from omegaconf import OmegaConf
-from torch.utils.data.dataset import Subset
-from datasets import load_dataset
+import os
 from typing import Tuple
+
+import hydra
+import torch
+from datasets import Dataset, load_dataset
+from omegaconf import OmegaConf
+from sklearn.metrics import accuracy_score, precision_recall_fscore_support
+from torch.utils.data.dataset import Subset
+from transformers import (AutoModelForSequenceClassification, AutoTokenizer,
+                          Trainer, TrainingArguments)
+
+import wandb
 
 
 def make_data_split(
-    data: Dataset, train_split: float = 0.7, validation_split: float = 0.15, test_split: float = 0.15
+    data: Dataset,
+    train_split: float = 0.7,
+    validation_split: float = 0.15,
+    test_split: float = 0.15,
 ) -> Tuple[Subset, Subset, Subset]:
     """
     Description:
@@ -60,7 +54,8 @@ def make_data_split(
 
     return train, validation, test
 
-MODEL_FILE_NAME = 'bert.model'
+
+MODEL_FILE_NAME = "bert.model"
 
 base_models = {"bert": {"checkpoint": "bert-base-cased", "save": "bert", "cased": True}}
 
@@ -76,9 +71,10 @@ def compute_metrics(eval_pred: torch.Tensor) -> dict:
     return {"accuracy": acc, "f1": f1, "precision": precision, "recall": recall}
 
 
-os.environ['WANDB_API'] = '58ce7d248861e83f1718e4fed0dba7c0925d6b08'
+os.environ["WANDB_API"] = "58ce7d248861e83f1718e4fed0dba7c0925d6b08"
 docker_api = os.environ.get("WANDB_API")
 wandb.login(key=docker_api)
+
 
 @hydra.main(config_path="configs", config_name="config.yaml")
 def main(config):
@@ -114,7 +110,6 @@ def main(config):
         # DATA PREPROCESSING
         data = load_dataset("tweets_hate_speech_detection", split="train")
 
-
         train, validation, test = make_data_split(data)
 
         # train = torch.load(data_dir + "train.pth")
@@ -128,8 +123,8 @@ def main(config):
 
         train_data = [
             t["tweet"].lower() if not base_model["cased"] else t["tweet"] for t in train
-        ]  
-        train_labels = [t["label"] for t in train]  
+        ]
+        train_labels = [t["label"] for t in train]
 
         assert len(train_data) == len(train_labels)
 
@@ -232,8 +227,8 @@ def main(config):
         model.save_pretrained(save_dir)
         tokenizer.save_pretrained(save_dir)
 
-        torch.save(model.state_dict(), cwd + 'models/bert.pth')
-        print('MODEL SAVED')
+        torch.save(model.state_dict(), cwd + "models/bert.pth")
+        print("MODEL SAVED")
 
         # if config['dirs']['cloud']:
         #     tmp_model_file = os.path.join('/tmp', MODEL_FILE_NAME)
@@ -250,7 +245,7 @@ def main(config):
         results = compute_metrics((predictions, labels))
         print(results)
 
-        print('#'*30 + ' DONE ' + '#'*30)
+        print("#" * 30 + " DONE " + "#" * 30)
 
 
 if __name__ == "__main__":

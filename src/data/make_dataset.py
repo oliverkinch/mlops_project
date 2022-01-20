@@ -1,12 +1,16 @@
-from datasets import load_dataset
+from typing import Tuple
+
 import torch
+from datasets import load_dataset
 from torch.utils.data import Dataset
 from torch.utils.data.dataset import Subset
-from typing import Tuple
 
 
 def make_data_split(
-    data: Dataset, train_split: float = 0.7, validation_split: float = 0.15, test_split: float = 0.15
+    data: Dataset,
+    train_split: float = 0.7,
+    validation_split: float = 0.15,
+    test_split: float = 0.15,
 ) -> Tuple[Subset, Subset, Subset]:
     """
     Description:
