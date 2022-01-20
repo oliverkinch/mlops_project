@@ -6,7 +6,7 @@ from typing import Tuple
 
 
 def make_data_split(
-    data: Dataset, train_split: float, validation_split: float, test_split: float
+    data: Dataset, train_split: float = 0.7, validation_split: float = 0.15, test_split: float = 0.15
 ) -> Tuple[Subset, Subset, Subset]:
     """
     Description:

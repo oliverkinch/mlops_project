@@ -25,7 +25,7 @@ from typing import Tuple
 
 
 def make_data_split(
-    data: Dataset, train_split: float, validation_split: float, test_split: float
+    data: Dataset, train_split: float = 0.7, validation_split: float = 0.15, test_split: float = 0.15
 ) -> Tuple[Subset, Subset, Subset]:
     """
     Description:
@@ -53,13 +53,12 @@ def make_data_split(
     test_len = int(len(data) * test_split)
     # Making sure that lengths add up, by adding the rest of the data to the training split.
     train_len = train_len + len(data) - (train_len + validation_len + test_len)
-    print('aloha'*20)
+
     train, validation, test = torch.utils.data.random_split(
         data, [train_len, validation_len, test_len]
     )
 
     return train, validation, test
-
 
 MODEL_FILE_NAME = 'bert.model'
 
@@ -114,16 +113,10 @@ def main(config):
 
         # DATA PREPROCESSING
         data = load_dataset("tweets_hate_speech_detection", split="train")
-        # torch.save(data, "data/raw/data.pt")
 
-        train_split = 0.7
-        validation_split = 0.15
-        test_split = 0.15
 
-        train, validation, test = make_data_split(
-            data, train_split, validation_split, test_split
-        )
-        # os.environ['HF_DATASSETS_CACHE'] = cwd + 'data/raw'
+        train, validation, test = make_data_split(data)
+
         # train = torch.load(data_dir + "train.pth")
         # validation = torch.load(data_dir + "validation.pth")
         # test = torch.load(data_dir + "test.pth")
@@ -135,8 +128,8 @@ def main(config):
 
         train_data = [
             t["tweet"].lower() if not base_model["cased"] else t["tweet"] for t in train
-        ]  #
-        train_labels = [t["label"] for t in train]  #
+        ]  
+        train_labels = [t["label"] for t in train]  
 
         assert len(train_data) == len(train_labels)
 
@@ -253,6 +246,8 @@ def main(config):
 
         results = compute_metrics((predictions, labels))
         print(results)
+
+        print('#'*30 + ' DONE ' + '#'*30)
 
 
 if __name__ == "__main__":
