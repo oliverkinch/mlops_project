@@ -229,9 +229,9 @@ def main(config):
 
         # SAVE MODEL
 
-        model.save_pretrained(save_dir)
-        tokenizer.save_pretrained(save_dir)
-
+        model.save_pretrained(save_dir + '_model')
+        tokenizer.save_pretrained(save_dir + '_tokenizers')
+        exit()
         torch.save(model.state_dict(), cwd + 'models/bert.pth')
         print('MODEL SAVED')
 
