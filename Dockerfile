@@ -2,6 +2,7 @@ FROM nvidia/cuda:10.2-base
 CMD nvidia-smi
 
 FROM python:3.8-slim
+WORKDIR /app
 
 # install python 
 RUN apt update && \
@@ -24,7 +25,7 @@ RUN wget -nv \
     # Remove the backup directory that gcloud creates
     rm -rf /root/tools/google-cloud-sdk/.install/.backup
 
-WORKDIR /app
+
 
 
 COPY requirements.txt /app/requirements.txt
