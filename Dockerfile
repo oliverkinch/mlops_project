@@ -10,6 +10,8 @@ RUN apt update && \
 
 WORKDIR /app
 
+RUN apt-get install wget
+
 # Installs google cloud sdk, this is mostly for using gsutil to export model.
 RUN wget -nv \
     https://dl.google.com/dl/cloudsdk/release/google-cloud-sdk.tar.gz && \
