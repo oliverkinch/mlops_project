@@ -9,7 +9,9 @@ RUN apt update && \
     apt install --no-install-recommends -y build-essential gcc && \
     apt clean && rm -rf /var/lib/apt/lists/*
 
-RUN apt-get install wget
+RUN  apt-get update \
+  && apt-get install -y wget \
+  && rm -rf /var/lib/apt/lists/*
 
 # Installs google cloud sdk, this is mostly for using gsutil to export model.
 RUN wget -nv \
