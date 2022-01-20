@@ -1,0 +1,24 @@
+{
+    "os": "Windows-10-10.0.19042-SP0",
+    "python": "3.9.7",
+    "heartbeatAt": "2022-01-19T12:35:52.128502",
+    "startedAt": "2022-01-19T12:35:49.733461",
+    "docker": null,
+    "gpu": "NVIDIA GeForce RTX 3060 Ti",
+    "gpu_count": 1,
+    "cpu_count": 12,
+    "cuda": null,
+    "args": [],
+    "state": "running",
+    "program": "c:\\Users\\Marku\\OneDrive - Danmarks Tekniske Universitet\\Studie\\7. Semester\\Machine Learning Operations\\mlops_project\\src\\models\\train_model.py",
+    "codePath": "src\\models\\train_model.py",
+    "git": {
+        "remote": "https://github.com/oliverkinch/mlops_project.git",
+        "commit": "a0da7db5f80799ab348a3eb3d05f45942adee364"
+    },
+    "email": "s183997@student.dtu.dk",
+    "root": "C:/Users/Marku/OneDrive - Danmarks Tekniske Universitet/Studie/7. Semester/Machine Learning Operations/mlops_project",
+    "host": "DESKTOP-8UG6P3F",
+    "username": "Marku",
+    "executable": "C:\\Users\\Marku\\anaconda3\\envs\\mlo_project\\python.exe"
+}

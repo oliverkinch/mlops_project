@@ -1,0 +1,4 @@
+name: mlo_project
+channels:
+  - defaults
+prefix: C:\Users\Marku\anaconda3\envs\mlo_project\envs\mlo_project
