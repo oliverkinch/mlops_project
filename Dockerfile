@@ -8,8 +8,6 @@ RUN apt update && \
     apt install --no-install-recommends -y build-essential gcc && \
     apt clean && rm -rf /var/lib/apt/lists/*
 
-WORKDIR /app
-
 RUN apt-get install wget
 
 # Installs google cloud sdk, this is mostly for using gsutil to export model.
@@ -25,6 +23,8 @@ RUN wget -nv \
     ln -s /root/.config /config && \
     # Remove the backup directory that gcloud creates
     rm -rf /root/tools/google-cloud-sdk/.install/.backup
+
+WORKDIR /app
 
 
 COPY requirements.txt /app/requirements.txt
