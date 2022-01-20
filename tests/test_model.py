@@ -1,5 +1,8 @@
-from transformers import AutoTokenizer, AutoModelForSequenceClassification
-import numpy as np
+
+import torch
+from transformers import AutoModelForSequenceClassification, AutoTokenizer
+
+
 
 def classify_tweet(tweet):
     d = {0: "no-hate-speech", 1: "hate-speech"}
