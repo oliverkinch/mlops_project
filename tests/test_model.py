@@ -1,7 +1,5 @@
-
-import torch
 from transformers import AutoModelForSequenceClassification, AutoTokenizer
-
+import numpy as np
 
 
 def classify_tweet(tweet):

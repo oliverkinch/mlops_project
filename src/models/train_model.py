@@ -9,8 +9,12 @@ from datasets import Dataset, load_dataset
 from omegaconf import OmegaConf
 from sklearn.metrics import accuracy_score, precision_recall_fscore_support
 from torch.utils.data.dataset import Subset
-from transformers import (AutoModelForSequenceClassification, AutoTokenizer,
-                          Trainer, TrainingArguments)
+from transformers import (
+    AutoModelForSequenceClassification,
+    AutoTokenizer,
+    Trainer,
+    TrainingArguments,
+)
 
 import wandb
 
@@ -224,13 +228,11 @@ def main(config):
 
         # SAVE MODEL
 
-
         model.save_pretrained(save_dir)
         tokenizer.save_pretrained(save_dir)
 
         torch.save(model.state_dict(), cwd + "models/bert.pth")
         print("MODEL SAVED")
-
 
         # if config['dirs']['cloud']:
         #     tmp_model_file = os.path.join('/tmp', MODEL_FILE_NAME)

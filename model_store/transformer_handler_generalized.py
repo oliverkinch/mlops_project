@@ -7,9 +7,12 @@ from abc import ABC
 import torch
 import transformers
 from captum.attr import LayerIntegratedGradients
-from transformers import (AutoModelForQuestionAnswering,
-                          AutoModelForSequenceClassification,
-                          AutoModelForTokenClassification, AutoTokenizer)
+from transformers import (
+    AutoModelForQuestionAnswering,
+    AutoModelForSequenceClassification,
+    AutoModelForTokenClassification,
+    AutoTokenizer,
+)
 from ts.torch_handler.base_handler import BaseHandler
 
 logger = logging.getLogger(__name__)
