@@ -1,0 +1,8 @@
+LOCAL DEPLOYMENT:
+torch-model-archiver --model-name tweet_classification --version 1.0 --serialized-file models/bert/final_checkpoint/pytorch_model.bin --handler model_store/transformer_handler_generalized.py --export-path model_store --extra-files "models/bert/final_checkpoint/config.json,models/bert/setup_config.json,models/bert/index_to_name.json" --force
+
+torchserve --start --model-store model_store --models tweet_classification=tweet_classification.mar --ncs 
+
+curl http://127.0.0.1:8080/predictions/tweet_classification -T model_store/tweet_hate.txt     
+
+curl http://127.0.0.1:8080/predictions/tweet_classification -T model_store/tweet_no_hate.txt
