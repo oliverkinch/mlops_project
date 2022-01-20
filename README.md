@@ -92,7 +92,7 @@ Project Organization
 
 ### Week 3
 
-- [ ] Deployed your model locally using TorchServe
+- [X] Deployed your model locally using TorchServe
 - [ ] Checked how robust your model is towards data drifting
 - [ ] Deployed your model using `gcp`
 - [ ] Monitored the system of your deployed model
