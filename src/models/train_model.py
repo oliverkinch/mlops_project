@@ -225,14 +225,6 @@ def main(config):
         )
         wandb.watch(model)
 
-        # Delete this block. For testing
-        if config['dirs']['cloud']:
-            tmp_model_file = os.path.join('/tmp', MODEL_FILE_NAME)
-            torch.save(model.state_dict(), tmp_model_file)
-            subprocess.check_call([
-                'gsutil', 'cp', tmp_model_file,
-                os.path.join(config['dirs']['cloud'], MODEL_FILE_NAME)])
-
         trainer.train()
 
         # SAVE MODEL
@@ -240,12 +232,15 @@ def main(config):
         model.save_pretrained(save_dir)
         tokenizer.save_pretrained(save_dir)
 
-        if config['dirs']['cloud']:
-            tmp_model_file = os.path.join('/tmp', MODEL_FILE_NAME)
-            torch.save(model.state_dict(), tmp_model_file)
-            subprocess.check_call([
-                'gsutil', 'cp', tmp_model_file,
-                os.path.join(config['dirs']['cloud'], MODEL_FILE_NAME)])
+        torch.save(model.state_dict(), cwd + 'models/bert.pth')
+        print('MODEL SAVED')
+
+        # if config['dirs']['cloud']:
+        #     tmp_model_file = os.path.join('/tmp', MODEL_FILE_NAME)
+        #     torch.save(model.state_dict(), tmp_model_file)
+        #     subprocess.check_call([
+        #         'gsutil', 'cp', tmp_model_file,
+        #         os.path.join(config['dirs']['cloud'], MODEL_FILE_NAME)])
         # EVALUATE
 
         trainer.evaluate()
