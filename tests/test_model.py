@@ -20,7 +20,7 @@ def classify_tweet(tweet):
 
 
 n_labels = 2
-checkpoint = "bert-base-cased"
+checkpoint = "models/checkpoint-16782"
 tokenizer = AutoTokenizer.from_pretrained(checkpoint)
 model = AutoModelForSequenceClassification.from_pretrained(
     checkpoint, num_labels=n_labels
@@ -31,3 +31,7 @@ assert model.classifier.out_features == 2, "There should be two output features"
 assert isinstance(
     classify_tweet("Life is nice"), str
 ), "Classifier should output hate speech or no hate speech"
+
+
+# print(classify_tweet('you asshole piece of shit'))
+# print(classify_tweet('What a nice nice nice day'))
