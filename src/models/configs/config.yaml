@@ -6,7 +6,7 @@ dirs:
   cloud: gcr.io/mlopsproject-338710/testing:latest
 hyperparameters:
   epochs: 1
-  batch_size: 64
+  batch_size: 8
   maxlength: 512
   lr: 0.00002
   weight_decay: 0.01

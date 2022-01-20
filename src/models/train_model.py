@@ -19,6 +19,47 @@ import logging
 import argparse
 import subprocess
 from omegaconf import OmegaConf
+from torch.utils.data.dataset import Subset
+from datasets import load_dataset
+from typing import Tuple
+
+
+def make_data_split(
+    data: Dataset, train_split: float, validation_split: float, test_split: float
+) -> Tuple[Subset, Subset, Subset]:
+    """
+    Description:
+        Making train, validation, test split of data and returning these.
+
+    Inputs:
+        data: The dataset used to make the splits.
+            type: Dataset
+        train_split: the amount of data used for training.
+            type: float between 0 and 1
+        validation_split: the amount of data used for validation.
+            type: float between 0 and 1
+        test_split: the amount of data used for testing.
+            type: float between 0 and 1
+    """
+
+    total_split = train_split + validation_split + test_split
+
+    train_split = train_split / total_split
+    validation_split = validation_split / total_split
+    test_split = test_split / total_split
+
+    train_len = int(len(data) * train_split)
+    validation_len = int(len(data) * validation_split)
+    test_len = int(len(data) * test_split)
+    # Making sure that lengths add up, by adding the rest of the data to the training split.
+    train_len = train_len + len(data) - (train_len + validation_len + test_len)
+    print('aloha'*20)
+    train, validation, test = torch.utils.data.random_split(
+        data, [train_len, validation_len, test_len]
+    )
+
+    return train, validation, test
+
 
 MODEL_FILE_NAME = 'bert.model'
 
@@ -58,7 +99,7 @@ def main(config):
             exit(0)
         cwd = os.getcwd().split("outputs/")[0]
         base_model = base_models[mname]
-        data_dir = cwd + config["dirs"]["data"]
+        # data_dir = cwd + config["dirs"]["data"]
 
         epochs = wandb.config["epochs"]
         devset_ratio = wandb.config["devset_ratio"]
@@ -72,10 +113,20 @@ def main(config):
             os.makedirs(save_dir)
 
         # DATA PREPROCESSING
+        data = load_dataset("tweets_hate_speech_detection", split="train")
+        # torch.save(data, "data/raw/data.pt")
 
-        train = torch.load(data_dir + "train.pth")
-        validation = torch.load(data_dir + "validation.pth")
-        test = torch.load(data_dir + "test.pth")
+        train_split = 0.7
+        validation_split = 0.15
+        test_split = 0.15
+
+        train, validation, test = make_data_split(
+            data, train_split, validation_split, test_split
+        )
+        # os.environ['HF_DATASSETS_CACHE'] = cwd + 'data/raw'
+        # train = torch.load(data_dir + "train.pth")
+        # validation = torch.load(data_dir + "validation.pth")
+        # test = torch.load(data_dir + "test.pth")
 
         labels = ["hate-speech", "no-hate-speech"]
         labels_str2int = {l: i for i, l in enumerate(labels)}
