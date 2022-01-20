@@ -1,10 +1,11 @@
+
 import torch
 from transformers import AutoModelForSequenceClassification, AutoTokenizer
 
 
+
 def classify_tweet(tweet):
     d = {0: "no-hate-speech", 1: "hate-speech"}
-    device = "cpu"
     inputs = tokenizer(
         [tweet],
         padding="max_length",
@@ -12,10 +13,10 @@ def classify_tweet(tweet):
         max_length=512,
         return_tensors="pt",
     )
-    input_ids = inputs.input_ids.to(device)
-    attention_mask = inputs.attention_mask.to(device)
+    input_ids = inputs.input_ids
+    attention_mask = inputs.attention_mask
     output = model(input_ids, attention_mask=attention_mask)
-    pred = torch.argmax(output.logits[0]).item()
+    pred = np.argmax(output.logits[0].detach().numpy())
     return d[pred]
 
 

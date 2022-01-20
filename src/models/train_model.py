@@ -224,11 +224,13 @@ def main(config):
 
         # SAVE MODEL
 
+
         model.save_pretrained(save_dir)
         tokenizer.save_pretrained(save_dir)
 
         torch.save(model.state_dict(), cwd + "models/bert.pth")
         print("MODEL SAVED")
+
 
         # if config['dirs']['cloud']:
         #     tmp_model_file = os.path.join('/tmp', MODEL_FILE_NAME)
