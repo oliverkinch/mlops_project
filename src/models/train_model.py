@@ -225,6 +225,14 @@ def main(config):
         )
         wandb.watch(model)
 
+        # Delete this block. For testing
+        if config['dirs']['cloud']:
+            tmp_model_file = os.path.join('/tmp', MODEL_FILE_NAME)
+            torch.save(model.state_dict(), tmp_model_file)
+            subprocess.check_call([
+                'gsutil', 'cp', tmp_model_file,
+                os.path.join(config['dirs']['cloud'], MODEL_FILE_NAME)])
+
         trainer.train()
 
         # SAVE MODEL
