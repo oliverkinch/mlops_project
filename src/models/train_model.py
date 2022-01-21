@@ -1,24 +1,22 @@
 import json
 import logging
 import os
-from typing import Tuple
 
 import hydra
 import torch
 from datasets import Dataset, load_dataset
 from omegaconf import OmegaConf
 from sklearn.metrics import accuracy_score, precision_recall_fscore_support
-from torch.utils.data.dataset import Subset
 from transformers import (AutoModelForSequenceClassification, AutoTokenizer,
                           Trainer, TrainingArguments)
 
 import wandb
 from src.data.make_dataset import make_data_split
 
-
 MODEL_FILE_NAME = "bert.model"
 
 base_models = {"bert": {"checkpoint": "bert-base-cased", "save": "bert", "cased": True}}
+
 
 def compute_metrics(eval_pred: torch.Tensor) -> dict:
     predictions, true_labels = eval_pred

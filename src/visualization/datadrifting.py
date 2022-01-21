@@ -1,24 +1,17 @@
-import torch
-from torch.utils.data import DataLoader
-from datasets import load_dataset
-import sklearn.manifold as manifold
-from sklearn.metrics import (
-    precision_recall_fscore_support,
-    accuracy_score
-)
-import matplotlib.pyplot as plt
+import copy
 import os
-import copy 
 import random
-from transformers import (
-    AutoTokenizer,
-    AutoModelForSequenceClassification,
-)
-from datasets import Dataset
-from torch.utils.data.dataset import Subset
-from datasets import load_dataset
 from typing import Tuple
+
+import matplotlib.pyplot as plt
+import sklearn.manifold as manifold
+import torch
 import torchdrift
+from datasets import Dataset, load_dataset
+from torch.utils.data import DataLoader
+from torch.utils.data.dataset import Subset
+from transformers import AutoModelForSequenceClassification, AutoTokenizer
+
 
 class TweetDataset(Dataset):
     def __init__(self, tweets, labels, transform=None):
@@ -37,6 +30,7 @@ class TweetDataset(Dataset):
             tweet = self.transform(tweet)
         return tweet, label
 
+
 def classify_tweet(tweet):
     d = {0: "no-hate-speech", 1: "hate-speech"}
     device = "cpu"
@@ -53,19 +47,28 @@ def classify_tweet(tweet):
     output = model(input_ids, attention_mask=attention_mask)
     corr_output = model(corr_input_ids, attention_mask=attention_mask)
     p_no_hate = torch.exp(output.logits[0][0]) / torch.sum(torch.exp(output.logits[0]))
-    corr_p_no_hate = torch.exp(corr_output.logits[0][0]) / torch.sum(torch.exp(corr_output.logits[0]))
+    corr_p_no_hate = torch.exp(corr_output.logits[0][0]) / torch.sum(
+        torch.exp(corr_output.logits[0])
+    )
     pred = torch.argmax(output.logits[0]).item()
     corr_pred = torch.argmax(corr_output.logits[0]).item()
     return p_no_hate, corr_p_no_hate, d[pred], d[corr_pred], input_ids, corr_input_ids
 
+
 def corruption_function(x: torch.Tensor):
-    x[x != 0] = x[x != 0] + torch.randint(low=-1000,high=1000,size=x[x != 0].shape) * torch.randint(low=0,high=2,size=x[x != 0].shape)
+    x[x != 0] = x[x != 0] + torch.randint(
+        low=-1000, high=1000, size=x[x != 0].shape
+    ) * torch.randint(low=0, high=2, size=x[x != 0].shape)
     x[x < 0] = 1
     x[x > 28996] = 28996
     return x
 
+
 def make_data_split(
-    data: Dataset, train_split: float = 0.7, validation_split: float = 0.15, test_split: float = 0.15
+    data: Dataset,
+    train_split: float = 0.7,
+    validation_split: float = 0.15,
+    test_split: float = 0.15,
 ) -> Tuple[Subset, Subset, Subset]:
     """
     Description:
@@ -100,7 +103,8 @@ def make_data_split(
 
     return train, validation, test
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
 
     seed = 13500
     torch.manual_seed(seed)
@@ -116,22 +120,29 @@ if __name__ == '__main__':
 
     checkpoint = "models/bert/final_checkpoint"
 
-    tokenizer = AutoTokenizer.from_pretrained(
-            checkpoint, do_lower_case=False
-        )
-    model = AutoModelForSequenceClassification.from_pretrained(
-            checkpoint, num_labels=2
-        )
-    
-    test_data = [
-            t["tweet"] for t in test
+    tokenizer = AutoTokenizer.from_pretrained(checkpoint, do_lower_case=False)
+    model = AutoModelForSequenceClassification.from_pretrained(checkpoint, num_labels=2)
+
+    test_data = [t["tweet"] for t in test]
+    test_data_tokenized = torch.stack(
+        [
+            tokenizer(
+                [t],
+                padding="max_length",
+                truncation=True,
+                max_length=512,
+                return_tensors="pt",
+            )["input_ids"]
+            for t in test_data
         ]
-    test_data_tokenized = torch.stack([tokenizer([t], padding="max_length", truncation=True, max_length=512, return_tensors="pt")["input_ids"] for t in test_data])
+    )
     test_labels = [t["label"] for t in test]
     test_labels_tokenized = torch.stack([torch.Tensor([t]) for t in test_labels])
 
     test_dataset = Dataset.from_dict({"text": test_data, "class": test_labels})
-    tokenized_test_dataset = Dataset.from_dict({"text": test_data_tokenized, "class": test_labels})
+    tokenized_test_dataset = Dataset.from_dict(
+        {"text": test_data_tokenized, "class": test_labels}
+    )
     iter_dataset = iter(test_dataset)
 
     test_tokenized_dataset = TweetDataset(test_data_tokenized, test_labels_tokenized)
@@ -153,10 +164,15 @@ if __name__ == '__main__':
     all_input_ids = []
     all_corr_input_ids = []
 
-
-
     for inp in inputs:
-        p_no_hate, corr_p_no_hate, pred, corr_pred, input_ids, corr_input_ids  = classify_tweet(inp)
+        (
+            p_no_hate,
+            corr_p_no_hate,
+            pred,
+            corr_pred,
+            input_ids,
+            corr_input_ids,
+        ) = classify_tweet(inp)
         correct_pred.append(d[inp["class"]])
         inputs_pred.append(pred)
         inputs_ood_pred.append(corr_pred)
@@ -164,44 +180,62 @@ if __name__ == '__main__':
         inputs_p_no_hate.append(p_no_hate)
         all_input_ids.append(input_ids)
         all_corr_input_ids.append(corr_input_ids)
-    
-    
-    dataloader = DataLoader(test_tokenized_dataset.tweets.view(-1,512), batch_size=8)
+
+    dataloader = DataLoader(test_tokenized_dataset.tweets.view(-1, 512), batch_size=8)
     feature_extractor = copy.deepcopy(model).bert
     drift_detector = torchdrift.detectors.KernelMMDDriftDetector()
     torchdrift.utils.fit(dataloader, feature_extractor, drift_detector, num_batches=10)
-    drift_detection_model = torch.nn.Sequential(
-        feature_extractor,
-        drift_detector
-    )
+    drift_detection_model = torch.nn.Sequential(feature_extractor, drift_detector)
 
-    features = feature_extractor(torch.stack(all_input_ids).view(-1,512))
+    features = feature_extractor(torch.stack(all_input_ids).view(-1, 512))
     features = features.last_hidden_state
-    features_ood = feature_extractor(torch.stack(all_corr_input_ids).view(-1,512))
+    features_ood = feature_extractor(torch.stack(all_corr_input_ids).view(-1, 512))
     features_ood = features_ood.last_hidden_state
-    score = drift_detector(features.view(len(all_input_ids),-1))
-    score_ood = drift_detector(features_ood.view(len(all_corr_input_ids),-1))
-    p_val = drift_detector.compute_p_value(features.view(len(all_input_ids),-1))
-    p_val_ood = drift_detector.compute_p_value(features_ood.view(len(all_corr_input_ids),-1))
+    score = drift_detector(features.view(len(all_input_ids), -1))
+    score_ood = drift_detector(features_ood.view(len(all_corr_input_ids), -1))
+    p_val = drift_detector.compute_p_value(features.view(len(all_input_ids), -1))
+    p_val_ood = drift_detector.compute_p_value(
+        features_ood.view(len(all_corr_input_ids), -1)
+    )
 
     N_base = drift_detector.base_outputs.size(0)
     mapper = manifold.Isomap(n_components=2)
     base_embedded = mapper.fit_transform(drift_detector.base_outputs.view(N_base, -1))
-    features_embedded = mapper.transform(features.view(features.shape[0],-1).detach())
-    features_ood_embedded = mapper.transform(features_ood.view(features_ood.shape[0],-1).detach())
-
-
-    plt.figure()
-    plt.scatter(base_embedded[:, 0], base_embedded[:, 1], s=2, c='r', label="base_embedding")
-    plt.scatter(features_embedded[:, 0], features_embedded[:, 1], s=4, c='b', label="features_in_dist")
-    plt.title(f'score {score:.2f} p-value {p_val:.2f}')
-    plt.legend()
-    plt.savefig("C:/Users/Marku/OneDrive - Danmarks Tekniske Universitet/Studie/7. Semester/Machine Learning Operations/mlops_project/reports/figures/datadrift_in_dist.pdf")
+    features_embedded = mapper.transform(features.view(features.shape[0], -1).detach())
+    features_ood_embedded = mapper.transform(
+        features_ood.view(features_ood.shape[0], -1).detach()
+    )
 
     plt.figure()
-    plt.scatter(base_embedded[:, 0], base_embedded[:, 1], s=2, c='r', label="base_embedding")
-    plt.scatter(features_ood_embedded[:, 0], features_ood_embedded[:, 1], s=4, c='g', label="features_ood")
-    plt.title(f'score {score_ood:.2f} p-value {p_val_ood:.2f}')
+    plt.scatter(
+        base_embedded[:, 0], base_embedded[:, 1], s=2, c="r", label="base_embedding"
+    )
+    plt.scatter(
+        features_embedded[:, 0],
+        features_embedded[:, 1],
+        s=4,
+        c="b",
+        label="features_in_dist",
+    )
+    plt.title(f"score {score:.2f} p-value {p_val:.2f}")
     plt.legend()
-    plt.savefig("C:/Users/Marku/OneDrive - Danmarks Tekniske Universitet/Studie/7. Semester/Machine Learning Operations/mlops_project/reports/figures/datadrift_ood.pdf")
-    
+    plt.savefig(
+        "/reports/figures/datadrift_in_dist.pdf"
+    )
+
+    plt.figure()
+    plt.scatter(
+        base_embedded[:, 0], base_embedded[:, 1], s=2, c="r", label="base_embedding"
+    )
+    plt.scatter(
+        features_ood_embedded[:, 0],
+        features_ood_embedded[:, 1],
+        s=4,
+        c="g",
+        label="features_ood",
+    )
+    plt.title(f"score {score_ood:.2f} p-value {p_val_ood:.2f}")
+    plt.legend()
+    plt.savefig(
+        "/reports/figures/datadrift_ood.pdf"
+    )

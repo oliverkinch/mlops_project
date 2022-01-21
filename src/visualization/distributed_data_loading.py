@@ -1,9 +1,11 @@
 import json
 import logging
 import os
-from typing import Tuple
 import time
+from typing import Tuple
+
 import hydra
+import matplotlib.pyplot as plt
 import torch
 from datasets import Dataset, load_dataset
 from omegaconf import OmegaConf
@@ -11,7 +13,7 @@ from sklearn.metrics import accuracy_score, precision_recall_fscore_support
 from torch.utils.data.dataset import Subset
 from transformers import (AutoModelForSequenceClassification, AutoTokenizer,
                           Trainer, TrainingArguments)
-import matplotlib.pyplot as plt
+
 import wandb
 
 
@@ -136,7 +138,7 @@ def main(config):
             for t in validation
         ]
         validation_labels = [t["label"] for t in validation]
-        
+
         validation_labels = validation_labels[::20]
         validation_data = validation_data[::20]
 
@@ -195,7 +197,7 @@ def main(config):
         model = model.to(device)
         metric_name = wandb.config["metric_name"]
 
-        workers = [1,2,4,8,12,16]
+        workers = [1, 2, 4, 8, 12, 16]
         work_timers = []
 
         for work in workers:
@@ -210,7 +212,7 @@ def main(config):
                 weight_decay=wandb.config["weight_decay"],
                 load_best_model_at_end=wandb.config["load_best_model_at_end"],
                 metric_for_best_model=metric_name,
-                dataloader_num_workers=work
+                dataloader_num_workers=work,
             )
 
             # TRAIN
@@ -221,7 +223,9 @@ def main(config):
             print("batch size =", batch_size)
             print("max length = ", max_length)
             print("train data = ", len(train_data))
-            print("dev data = ", len(validation_data), "(", devset_ratio, "% of train )")
+            print(
+                "dev data = ", len(validation_data), "(", devset_ratio, "% of train )"
+            )
             print("\n")
 
             trainer = Trainer(
@@ -238,7 +242,7 @@ def main(config):
             trainer.train()
             t2 = time.time()
 
-            work_timers.append(t2-t1)
+            work_timers.append(t2 - t1)
 
             # SAVE MODEL
 
@@ -270,7 +274,10 @@ def main(config):
         plt.xlabel("N workers")
         plt.ylabel("Time (s)")
         plt.title("Training time/Number of workers")
-        plt.savefig("C:/Users/Marku/OneDrive - Danmarks Tekniske Universitet/Studie/7. Semester/Machine Learning Operations/mlops_project/reports/figures/distributed_data_loading.pdf")
+        plt.savefig(
+            "/reports/figures/distributed_data_loading.pdf"
+        )
+
 
 if __name__ == "__main__":
     log = logging.getLogger(__name__)
