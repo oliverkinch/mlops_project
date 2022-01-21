@@ -13,12 +13,11 @@ def entry(request):
     elif request_json and 'message' in request_json:
         return classify_tweet(request_json['message'])
     else:
-        return f'Hello World!'
+        return 'No message supplied'
 
 
 def classify_tweet(tweet):
     from google.cloud import storage
-    import pickle
     from transformers import AutoTokenizer, AutoModelForSequenceClassification
     import torch
     import os
