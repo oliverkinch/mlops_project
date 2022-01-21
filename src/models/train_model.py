@@ -71,7 +71,6 @@ def compute_metrics(eval_pred: torch.Tensor) -> dict:
     return {"accuracy": acc, "f1": f1, "precision": precision, "recall": recall}
 
 
-os.environ["WANDB_API"] = "58ce7d248861e83f1718e4fed0dba7c0925d6b08"
 docker_api = os.environ.get("WANDB_API")
 wandb.login(key=docker_api)
 
