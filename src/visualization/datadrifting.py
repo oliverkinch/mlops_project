@@ -219,9 +219,7 @@ if __name__ == "__main__":
     )
     plt.title(f"score {score:.2f} p-value {p_val:.2f}")
     plt.legend()
-    plt.savefig(
-        "/reports/figures/datadrift_in_dist.pdf"
-    )
+    plt.savefig("/reports/figures/datadrift_in_dist.pdf")
 
     plt.figure()
     plt.scatter(
@@ -236,6 +234,4 @@ if __name__ == "__main__":
     )
     plt.title(f"score {score_ood:.2f} p-value {p_val_ood:.2f}")
     plt.legend()
-    plt.savefig(
-        "/reports/figures/datadrift_ood.pdf"
-    )
+    plt.savefig("/reports/figures/datadrift_ood.pdf")

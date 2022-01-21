@@ -274,9 +274,7 @@ def main(config):
         plt.xlabel("N workers")
         plt.ylabel("Time (s)")
         plt.title("Training time/Number of workers")
-        plt.savefig(
-            "/reports/figures/distributed_data_loading.pdf"
-        )
+        plt.savefig("/reports/figures/distributed_data_loading.pdf")
 
 
 if __name__ == "__main__":

@@ -17,4 +17,9 @@ for d in data:
     assert isinstance(sample["label"], int)
     assert isinstance(sample["tweet"], str)
 
+data_raw_dir = "data/raw/"
+data_raw = torch.load(data_raw_dir + "data.pt")
+
+assert len(data_raw) == 31962, "There should be 31962 entries in raw data"
+
 print("Data is good")
