@@ -13,52 +13,12 @@ from transformers import (AutoModelForSequenceClassification, AutoTokenizer,
                           Trainer, TrainingArguments)
 
 import wandb
-
-
-def make_data_split(
-    data: Dataset,
-    train_split: float = 0.7,
-    validation_split: float = 0.15,
-    test_split: float = 0.15,
-) -> Tuple[Subset, Subset, Subset]:
-    """
-    Description:
-        Making train, validation, test split of data and returning these.
-
-    Inputs:
-        data: The dataset used to make the splits.
-            type: Dataset
-        train_split: the amount of data used for training.
-            type: float between 0 and 1
-        validation_split: the amount of data used for validation.
-            type: float between 0 and 1
-        test_split: the amount of data used for testing.
-            type: float between 0 and 1
-    """
-
-    total_split = train_split + validation_split + test_split
-
-    train_split = train_split / total_split
-    validation_split = validation_split / total_split
-    test_split = test_split / total_split
-
-    train_len = int(len(data) * train_split)
-    validation_len = int(len(data) * validation_split)
-    test_len = int(len(data) * test_split)
-    # Making sure that lengths add up, by adding the rest of the data to the training split.
-    train_len = train_len + len(data) - (train_len + validation_len + test_len)
-
-    train, validation, test = torch.utils.data.random_split(
-        data, [train_len, validation_len, test_len]
-    )
-
-    return train, validation, test
+from src.data.make_dataset import make_data_split
 
 
 MODEL_FILE_NAME = "bert.model"
 
 base_models = {"bert": {"checkpoint": "bert-base-cased", "save": "bert", "cased": True}}
-
 
 def compute_metrics(eval_pred: torch.Tensor) -> dict:
     predictions, true_labels = eval_pred
