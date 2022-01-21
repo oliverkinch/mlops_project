@@ -2,9 +2,10 @@ mlops_project
 ==============================
 
 We want to train a model to detect hate speech.
-We will be using the Transformer framework, which includes several pretrained models that we want to fine-tune.
-Initially we will be working with the Hugging Face dataset: tweets_hate_speech_detection, where every sample is a tweet (string) that are either labeled as hate-speech or no-hate-speech.
-For deep learning models we expect to use several models from the [transformers.AutoModelForSequenceClassification](https://huggingface.co/docs/transformers/model_doc/auto).
+We will be using the Transformer framework, which includes several pretrained models that can be fine-tuned downstream tasks.
+We will be working with the Hugging Face dataset: tweets_hate_speech_detection, where every sample is a tweet (string) that are either labeled as hate-speech (1) or no-hate-speech (0).
+
+
 
 
 Project Organization
