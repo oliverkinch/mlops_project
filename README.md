@@ -22,6 +22,8 @@ Project Organization
     │
     ├── docs               <- A default Sphinx project; see sphinx-doc.org for details
     │
+    ├── gcp                <- Script and requirements for deploying model to Google Cloud Functions 
+    │
     ├── models             <- Trained and serialized models, model predictions, or model summaries
     │
     ├── notebooks          <- Jupyter notebooks. Naming convention is a number (for ordering),
@@ -95,9 +97,9 @@ Project Organization
 
 - [X] Deployed your model locally using TorchServe
 - [X] Checked how robust your model is towards data drifting
-- [ ] Deployed your model using `gcp`
-- [ ] Monitored the system of your deployed model
-- [ ] Monitored the performance of your deployed model
+- [X] Deployed your model using `gcp`
+- [X] Monitored the system of your deployed model
+- [X] Monitored the performance of your deployed model
 
 ### Additional
 
