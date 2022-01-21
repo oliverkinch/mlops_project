@@ -1,5 +1,4 @@
 import json
-import logging
 import os
 
 import hydra
@@ -207,5 +206,4 @@ def main(config):
 
 
 if __name__ == "__main__":
-    log = logging.getLogger(__name__)
     main()
